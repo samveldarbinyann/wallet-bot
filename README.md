@@ -82,3 +82,7 @@ docker compose up -d db
 [`DOCUMENTATION.md`](DOCUMENTATION.md) (in Russian) covers every flow in depth: wallet generation, authentication,
 sending, swaps, deposit detection, notifications, caching, security, database schema, background jobs and
 configuration.
+
+## License
+
+[MIT](LICENSE)
