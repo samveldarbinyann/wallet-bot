@@ -2,6 +2,7 @@ package com.example.walletbot.wallet.api;
 
 import com.example.walletbot.platform.web.validation.NetworkParser;
 import com.example.walletbot.shared.constant.BlockchainNetwork;
+import com.example.walletbot.shared.exception.BadRequestException;
 import com.example.walletbot.shared.util.QrCodeService;
 import com.example.walletbot.testsupport.MiniAppMvc;
 import com.example.walletbot.user.domain.UserEntity;
@@ -45,7 +46,7 @@ class WalletControllerTest {
     void getReceiveAddress_validNetwork_returnsAddressAndQr() throws Exception {
         WalletEntity wallet = new WalletEntity();
         wallet.setAddress("0xABC");
-        when(walletService.getWalletForNetwork(user, BlockchainNetwork.ETH)).thenReturn(wallet);
+        when(walletService.getWalletForNetworkOrThrow(user, BlockchainNetwork.ETH)).thenReturn(wallet);
         when(qrCodeService.generateQrDataUrl("0xABC")).thenReturn("data:image/png;base64,xxx");
 
         mvc.perform(get("/api/miniapp/wallets/ETH/receive"))
@@ -62,7 +63,8 @@ class WalletControllerTest {
 
     @Test
     void getReceiveAddress_noWallet_returns400() throws Exception {
-        when(walletService.getWalletForNetwork(user, BlockchainNetwork.ETH)).thenReturn(null);
+        when(walletService.getWalletForNetworkOrThrow(user, BlockchainNetwork.ETH))
+                .thenThrow(new BadRequestException("error.no_wallet_for_network", "ETH"));
 
         mvc.perform(get("/api/miniapp/wallets/ETH/receive"))
                 .andExpect(status().isBadRequest());

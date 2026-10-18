@@ -52,7 +52,8 @@ class QrShareServiceTest {
 
     @Test
     void prepareShare_noWallet_throws() {
-        when(walletService.getWalletForNetwork(user, BlockchainNetwork.ETH)).thenReturn(null);
+        when(walletService.getWalletForNetworkOrThrow(user, BlockchainNetwork.ETH))
+                .thenThrow(new BadRequestException("error.no_wallet_for_network", "ETH"));
 
         assertThatThrownBy(() -> service.prepareShare(user, BlockchainNetwork.ETH))
                 .isInstanceOf(BadRequestException.class)
@@ -63,7 +64,7 @@ class QrShareServiceTest {
     void prepareShare_buildsPhotoUrlWithoutDoubleSlashAndReturnsMessageId() {
         WalletEntity wallet = new WalletEntity();
         wallet.setAddress("0xABC");
-        when(walletService.getWalletForNetwork(user, BlockchainNetwork.ETH)).thenReturn(wallet);
+        when(walletService.getWalletForNetworkOrThrow(user, BlockchainNetwork.ETH)).thenReturn(wallet);
         when(tokenStore.store("0xABC")).thenReturn("tok123");
         when(inlineMessagePreparer.preparePhotoMessage(eq(100L), eq("https://wallet.example.com/api/files/qr/tok123"), any()))
                 .thenReturn("msg-1");
@@ -78,7 +79,7 @@ class QrShareServiceTest {
     void prepareShare_prepareFails_throws() {
         WalletEntity wallet = new WalletEntity();
         wallet.setAddress("0xABC");
-        when(walletService.getWalletForNetwork(user, BlockchainNetwork.ETH)).thenReturn(wallet);
+        when(walletService.getWalletForNetworkOrThrow(user, BlockchainNetwork.ETH)).thenReturn(wallet);
         when(tokenStore.store("0xABC")).thenReturn("tok123");
         when(inlineMessagePreparer.preparePhotoMessage(any(), any(), any())).thenReturn(null);
 
