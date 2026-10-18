@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" translate="no" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width,initial-scale=1" name="viewport"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="dark" name="color-scheme"/>
+    <meta content="dark" name="supported-color-schemes"/>
+    <meta content="notranslate" name="google"/>
+    <title th:text="${title}">Verification Code</title>
+    <style>
+        @media (max-width: 620px) {
+            .card {
+                width: 100% !important
+            }
+
+            .pad {
+                padding: 32px 24px !important
+            }
+
+            .code {
+                font-size: 34px !important;
+                letter-spacing: 8px !important
+            }
+        }
+    </style>
+</head>
+<body class="notranslate"
+      style="margin:0;padding:0;background:#08090C;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#E6E7EB;">
+
+<table bgcolor="#08090C" border="0" cellpadding="0" cellspacing="0" class="notranslate" role="presentation"
+       style="background:#08090C;" width="100%">
+    <tr>
+        <td align="center" style="padding:48px 20px;">
+
+            <!-- Wordmark -->
+            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-bottom:20px;">
+                <tr>
+                    <td style="font-size:11px;font-weight:600;color:#6B6E78;letter-spacing:4px;text-transform:uppercase;">
+                        UNIT&nbsp;&middot;&nbsp;WALLET
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Card -->
+            <table bgcolor="#101218" border="0" cellpadding="0" cellspacing="0" class="card" role="presentation"
+                   style="width:560px;max-width:100%;background:#101218;border:1px solid #1E2029;border-radius:20px;"
+                   width="560">
+                <tr>
+                    <td class="pad" style="padding:44px 48px;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+
+                            <!-- Label -->
+                            <tr>
+                                <td style="padding-bottom:8px;">
+                                    <p style="margin:0;font-size:12px;font-weight:600;color:#8B7CFF;letter-spacing:2px;text-transform:uppercase;">
+                                        Verification</p>
+                                </td>
+                            </tr>
+
+                            <!-- Title -->
+                            <tr>
+                                <td style="padding-bottom:32px;">
+                                    <h1 style="margin:0;font-size:26px;font-weight:600;color:#F4F5F8;line-height:1.25;letter-spacing:-0.5px;"
+                                        th:text="${title}">Verification Code</h1>
+                                </td>
+                            </tr>
+
+                            <!-- Intro -->
+                            <tr>
+                                <td style="padding-bottom:20px;">
+                                    <p style="margin:0;font-size:15px;color:#8B8E99;line-height:1.6;"
+                                       th:text="${intro}">Enter the code below to continue.</p>
+                                </td>
+                            </tr>
+
+                            <!-- Code block -->
+                            <tr>
+                                <td style="padding-bottom:18px;">
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                                        <tr>
+                                            <td align="center" bgcolor="#0A0B0F"
+                                                style="background:#0A0B0F;border:1px solid #1E2029;border-radius:14px;padding:32px 20px;">
+                                                <p class="code"
+                                                   style="margin:0;font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;font-size:44px;font-weight:600;color:#F4F5F8;letter-spacing:14px;line-height:1;text-indent:14px;text-align:center;"
+                                                   th:text="${code}">000000</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+
+                            <!-- Expiry -->
+                            <tr>
+                                <td style="padding-bottom:32px;text-align:center;">
+                                    <p style="margin:0;font-size:13px;color:#5C5F69;text-align:center;letter-spacing:0.3px;"
+                                       th:text="${expiry}">Valid for 10 minutes</p>
+                                </td>
+                            </tr>
+
+                            <!-- Security note -->
+                            <tr>
+                                <td>
+                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                                        <tr>
+                                            <td bgcolor="#8B7CFF" style="background:#8B7CFF;border-radius:2px;font-size:0;line-height:0;"
+                                                width="3">
+                                                &#8203;
+                                            </td>
+                                            <td style="padding-left:14px;">
+                                                <p style="margin:0;font-size:13px;color:#9498A4;line-height:1.6;"
+                                                   th:text="${security}">Never share this code with anyone.</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Footer -->
+            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin-top:24px;">
+                <tr>
+                    <td align="center">
+                        <p style="margin:0;font-size:12px;color:#4A4D56;line-height:1.6;"
+                           th:text="${footer}">© UNIT Wallet</p>
+                    </td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

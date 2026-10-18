@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="044-drop-fiat-orders" author="fiat-removal">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="fiat_orders"/>
+        </preConditions>
+        <comment>Drop the fiat_orders table — the fiat on-ramp (MoonPay) feature was removed. The
+            precondition makes this a no-op where the table never existed (the feature never reached
+            prod), and drops it where the old 042 changeset had been applied.
+        </comment>
+        <dropTable tableName="fiat_orders"/>
+    </changeSet>
+
+</databaseChangeLog>

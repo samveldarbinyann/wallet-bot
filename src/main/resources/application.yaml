@@ -1,0 +1,218 @@
+spring:
+  application:
+    name: wallet-bot
+  mail:
+    host: ${MAIL_SMTP_HOST:smtp.gmail.com}
+    port: ${MAIL_SMTP_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/wallet_bot}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.xml
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+app:
+  broadcast:
+    image-dir: ${BROADCAST_IMAGE_DIR:./uploads/broadcasts}
+  public-url: ${APP_PUBLIC_URL:http://localhost:8080}
+  # Refresh-token cookie Secure flag. Must be false for http:// local dev, true in prod.
+  cookie-secure: ${COOKIE_SECURE:true}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+telegram:
+  bot:
+    token: ${BOT_TOKEN:}
+  miniapp:
+    url: ${MINI_APP_URL:http://localhost:3000}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES:15}
+  refresh-ttl-days: ${JWT_REFRESH_TTL_DAYS:30}
+
+cors:
+  allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
+
+encryption:
+  password: ${ENCRYPTION_PASSWORD}
+  salt: ${ENCRYPTION_SALT}
+rpc:
+  eth:
+    url: https://eth-mainnet.g.alchemy.com/v2/
+    key: ${ALCHEMY_KEY:}
+  bnb:
+    url: https://bnb-mainnet.g.alchemy.com/v2/
+    key: ${ALCHEMY_KEY:}
+  btc:
+    url: ${GETBLOCK_BTC_URL:}
+  sol:
+    url: https://mainnet.helius-rpc.com/?api-key=
+    key: ${HELIUS_KEY:}
+  ton:
+    url: https://toncenter.com/api/v2
+    key: ${TON_KEY:}
+  tron:
+    url: https://api.trongrid.io
+    key: ${TRON_KEY:}
+
+# Alchemy Address Activity webhooks — push-based EVM (ETH/BNB) deposit detection. One webhook
+# per network: `id` for the address-subscription API, `signing-key` to verify inbound HMAC.
+# `auth-token` is the Notify access token used to add addresses. Leave blank to disable.
+alchemy:
+  webhook:
+    dashboard-url: ${ALCHEMY_DASHBOARD_URL:https://dashboard.alchemy.com}
+    auth-token: ${ALCHEMY_NOTIFY_AUTH_TOKEN:}
+    eth:
+      id: ${ALCHEMY_WEBHOOK_ETH_ID:}
+      signing-key: ${ALCHEMY_WEBHOOK_ETH_SIGNING_KEY:}
+    bnb:
+      id: ${ALCHEMY_WEBHOOK_BNB_ID:}
+      signing-key: ${ALCHEMY_WEBHOOK_BNB_SIGNING_KEY:}
+
+# Helius webhook — push-based Solana (SOL + SPL USDT/USDC) deposit detection. Provisioned once out
+# of band: `id` is the webhook id used by the address-management API; `auth-header` is the secret
+# Helius echoes in the inbound `Authorization` header (verified per request). The management API
+# key reuses `rpc.sol.key` (HELIUS_KEY). Leave `id` blank to disable.
+helius:
+  webhook:
+    management-url: ${HELIUS_WEBHOOK_MANAGEMENT_URL:https://api.helius.xyz}
+    id: ${HELIUS_WEBHOOK_ID:}
+    auth-header: ${HELIUS_WEBHOOK_AUTH_HEADER:}
+
+# TonAPI / TON Console webhook — push-based TON (native GRAM + USDT Jetton) deposit detection.
+# Provisioned once out of band against rt.tonapi.io: `id` is the webhook id used by the
+# account-subscription API; `token` is the TON Console API key (Bearer) used to subscribe addresses;
+# `secret` is our own value baked into the registered endpoint URL (.../api/webhooks/ton?secret=...)
+# and verified per request, since TonAPI does not sign deliveries. Leave `id`/`token` blank to disable.
+tonapi:
+  webhook:
+    management-url: ${TONAPI_WEBHOOK_MANAGEMENT_URL:https://rt.tonapi.io}
+    id: ${TONAPI_WEBHOOK_ID:}
+    secret: ${TONAPI_WEBHOOK_SECRET:}
+    token: ${TONAPI_WEBHOOK_TOKEN:}
+
+swap:
+  intent:
+    # Execution window for a swap intent token — must comfortably outlive PIN/2FA entry
+    # after the quote is shown (the provider-quote freshness window is much shorter).
+    ttl-seconds: ${SWAP_INTENT_TTL_SECONDS:600}
+  providers:
+    simpleswap:
+      url: ${SWAP_SIMPLESWAP_URL:https://api.simpleswap.io}
+      key: ${SIMPLESWAP_KEY:}
+      enabled: ${SWAP_SIMPLESWAP_ENABLED:true}
+      quote-ttl-seconds: 60
+      connect-timeout-ms: 3000
+      read-timeout-ms: 8000
+      priority: 500
+      # Partner fee — must match the rate configured in the SimpleSwap partner dashboard.
+      partner-fee-percent: ${SWAP_PARTNER_FEE_PERCENT:0.01}
+      slippage-percent: ${SWAP_SLIPPAGE_PERCENT:0.02}
+      # Outbound rate limit shared by all SimpleSwap calls. SimpleSwap docs target ~10 rps.
+      rate-limit-rps: ${SWAP_SIMPLESWAP_RPS:10}
+      # Prewarm the pairs catalogue on startup so the first user does not pay a cold walk.
+      prewarm-on-start: ${SWAP_PREWARM_ON_START:true}
+  scheduler:
+    status-poller:
+      enabled: ${SWAP_STATUS_POLLER_ENABLED:true}
+      delay-ms: ${SWAP_STATUS_POLLER_DELAY_MS:60000}
+      initial-delay-ms: ${SWAP_STATUS_POLLER_INITIAL_DELAY_MS:15000}
+      batch-size: ${SWAP_STATUS_POLLER_BATCH_SIZE:5}
+
+news:
+  cache-ttl-minutes: 10
+  page-size: 20
+  refresh:
+    enabled: ${NEWS_REFRESH_ENABLED:true}
+  feeds:
+    - url: https://cointelegraph.com/rss
+      name: CoinTelegraph
+      lang: en
+    - url: https://cryptoslate.com/feed/
+      name: CryptoSlate
+      lang: en
+    - url: https://bitcoinmagazine.com/feed
+      name: Bitcoin Magazine
+      lang: en
+    - url: https://decrypt.co/feed
+      name: Decrypt
+      lang: en
+    - url: https://ru.beincrypto.com/feed/
+      name: BeInCrypto
+      lang: ru
+    - url: https://coinspot.io/feed/
+      name: CoinSpot
+      lang: ru
+    - url: https://forklog.com/feed/
+      name: ForkLog
+      lang: ru
+
+mail:
+  twofa:
+    otp-ttl-minutes: ${MAIL_OTP_TTL:10}
+    resend-cooldown-seconds: ${MAIL_RESEND_COOLDOWN:120}
+    max-attempts: ${MAIL_OTP_MAX_ATTEMPTS:5}
+
+admin:
+  bootstrap:
+    telegram-ids: ${ADMIN_TELEGRAM_IDS:}
+
+security:
+  pin-pepper: ${PIN_PEPPER}
+  trusted-proxy-count: ${TRUSTED_PROXY_COUNT:0}
+
+intent:
+  secret: ${INTENT_SECRET}
+
+blockchain:
+  btc:
+    network: mainnet
+    mempool-base-url: https://mempool.space/api
+  ton:
+    wallet-id: 698983191
+    transfer-comment: ""
+    tx-valid-until-seconds: 90
+    rate-limit-per-second: 5
+  token:
+    usdt-erc20-contract: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    usdc-erc20-contract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    usdt-bep20-contract: "0x55d398326f99059fF775485246999027B3197955"
+    usdc-bep20-contract: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"
+    usdt-trc20-contract: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+    usdt-ton-jetton-master: "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs"
+    usdt-sol-mint: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+    usdc-sol-mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+  evm:
+    eth-chain-id: 1
+    bnb-chain-id: 56
+    strict-checksum: false
+
+logging:
+  level:
+    root: INFO
+    com.example.walletbot: INFO

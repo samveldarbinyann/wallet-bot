@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: wallet_bot_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      POSTGRES_DB: wallet_bot
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pg_wallet_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d wallet_bot" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wallet_bot_backend
+    restart: always
+    mem_limit: 1536m
+    cpus: "2"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # Docker-network wiring — overrides whatever DB_URL might be in .env, since inside
+      # the compose network the DB is reachable by service name, not localhost.
+      DB_URL: jdbc:postgresql://db:5432/wallet_bot
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  pg_wallet_data:

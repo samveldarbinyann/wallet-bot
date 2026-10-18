@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="040-fee-log-broadcast-state" author="fee-confirm">
+        <comment>
+            Old code marked a reimbursement SUCCESS the instant the node accepted the
+            broadcast, never verifying it on-chain — so dropped reimbursements look
+            collected but never were. Re-open every broadcast-but-unverified row to the new
+            BROADCAST state; FeeStatusPoller reconciles each against the chain (confirmed
+            ones return to SUCCESS, dropped ones fall to FAILED and get retried).
+        </comment>
+        <update tableName="fee_log">
+            <column name="status" value="BROADCAST"/>
+            <where>status = 'SUCCESS' AND tx_hash_fee IS NOT NULL</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

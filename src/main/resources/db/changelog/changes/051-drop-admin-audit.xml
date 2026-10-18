@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="051-drop-admin-audit" author="sam">
+        <comment>
+            Drop the write-only admin_audit table (created in 032). The audit feature was
+            never read back (no endpoint/UI) and is removed as premature.
+        </comment>
+
+        <dropTable tableName="admin_audit"/>
+    </changeSet>
+
+</databaseChangeLog>

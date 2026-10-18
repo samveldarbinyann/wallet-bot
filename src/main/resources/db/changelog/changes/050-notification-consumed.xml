@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="050-notification-consumed" author="kafka-outbox">
+        <comment>Idempotency ledger for the notification consumer. Kafka delivers at-least-once, so the
+            same message can arrive more than once (retries, rebalances). The consumer claims an
+            event_id here before delivering and skips any id already present, preventing duplicate
+            in-app rows / pushes.
+        </comment>
+        <createTable tableName="notification_consumed">
+            <column name="event_id" type="varchar(64)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="consumed_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

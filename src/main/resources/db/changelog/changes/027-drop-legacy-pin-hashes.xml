@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="027-drop-legacy-pin-hashes" author="security-audit">
+        <comment>
+            Invalidate legacy non-bcrypt PIN hashes (raw SHA-256 from older builds).
+            Affected users must re-set their PIN via the standard /pin/set flow.
+            Safe under pre-production constraints; do not run on prod without notice.
+        </comment>
+        <sql>
+            UPDATE users
+            SET pin_hash         = NULL,
+                pin_enabled      = false,
+                pin_failures     = 0,
+                pin_locked_until = NULL,
+                token_version    = token_version + 1
+            WHERE pin_hash IS NOT NULL
+              AND pin_hash NOT LIKE '{bcrypt}%';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

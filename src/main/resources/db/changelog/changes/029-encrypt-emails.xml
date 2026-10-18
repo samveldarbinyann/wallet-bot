@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="029-encrypt-emails" author="security-audit">
+        <comment>
+            Encrypt users.email and users.pending_email at rest via EncryptionConverter.
+            Encrypted ciphertext is non-deterministic, so the UNIQUE-by-email constraint
+            moves to a new email_hash column (HMAC-SHA256 of the normalised email).
+
+            Pre-production safety: existing emails are reset because we cannot decrypt
+            plaintext-stored values with the new encrypted column. Users must re-bind
+            email; dependent 2FA settings are cleared to avoid lockouts.
+        </comment>
+
+        <sql>DROP INDEX IF EXISTS idx_users_email_partial;</sql>
+
+        <sql>
+            UPDATE users
+            SET email                = NULL,
+                pending_email        = NULL,
+                email_verified_at    = NULL,
+                two_fa_login_enabled = false,
+                two_fa_tx_enabled    = false,
+                pin_hash             = NULL,
+                pin_enabled          = false,
+                pin_failures         = 0,
+                pin_locked_until     = NULL,
+                token_version        = token_version + 1
+            WHERE email IS NOT NULL
+               OR pending_email IS NOT NULL;
+        </sql>
+
+        <modifyDataType tableName="users" columnName="email" newDataType="VARCHAR(500)"/>
+        <modifyDataType tableName="users" columnName="pending_email" newDataType="VARCHAR(500)"/>
+
+        <addColumn tableName="users">
+            <column name="email_hash" type="VARCHAR(64)"/>
+        </addColumn>
+
+        <sql>
+            CREATE UNIQUE INDEX idx_users_email_hash ON users (email_hash) WHERE email_hash IS NOT NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

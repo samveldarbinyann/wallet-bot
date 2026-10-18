@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="052-drop-security-audit-log" author="sam">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="security_audit_log"/>
+        </preConditions>
+        <comment>
+            Drop orphaned security_audit_log table. Created by migration 017, which was
+            deleted from the changelog (commit d2ce287) without a corresponding drop —
+            the table was never removed from already-migrated databases. Unused by current code.
+        </comment>
+        <dropTable tableName="security_audit_log"/>
+    </changeSet>
+
+    <changeSet id="052-drop-admin-audit-log" author="sam">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="admin_audit_log"/>
+        </preConditions>
+        <comment>
+            Drop orphaned admin_audit_log table. Never created by any Liquibase migration
+            (only ever appeared in planning docs) — appears to be a manual SQL prototype
+            predating the real admin_audit table (032, dropped in 051). Unused by current code.
+        </comment>
+        <dropTable tableName="admin_audit_log"/>
+    </changeSet>
+
+</databaseChangeLog>

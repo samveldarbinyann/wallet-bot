@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="053-user-username-lower-index" author="code-review">
+        <sql dbms="postgresql">
+            CREATE INDEX IF NOT EXISTS users_username_lower_idx ON users (LOWER(username))
+        </sql>
+        <rollback>
+            <sql dbms="postgresql">DROP INDEX IF EXISTS users_username_lower_idx</sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

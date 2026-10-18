@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="054-user-username-dedupe" author="code-review">
+        <comment>
+            Telegram usernames can be freed and reclaimed by a different account; before
+            enforcing DB-level uniqueness, keep only the most-recently-logged-in row per
+            (lower-cased) username and null the rest, so the unique index below can be
+            created without failing on pre-existing duplicates.
+        </comment>
+        <sql dbms="postgresql">
+            UPDATE users u
+            SET username = NULL
+            WHERE username IS NOT NULL
+            AND u.id NOT IN (
+                SELECT DISTINCT ON (LOWER(username)) id
+                FROM users
+                WHERE username IS NOT NULL
+                ORDER BY LOWER(username), last_login_at DESC NULLS LAST, id DESC
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet id="054-drop-user-username-lower-index" author="code-review">
+        <sql dbms="postgresql">
+            DROP INDEX IF EXISTS users_username_lower_idx
+        </sql>
+        <rollback>
+            <sql dbms="postgresql">CREATE INDEX IF NOT EXISTS users_username_lower_idx ON users (LOWER(username))</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="054-user-username-lower-unique-index" author="code-review">
+        <sql dbms="postgresql">
+            CREATE UNIQUE INDEX IF NOT EXISTS users_username_lower_unique_idx ON users (LOWER(username)) WHERE username IS NOT NULL
+        </sql>
+        <rollback>
+            <sql dbms="postgresql">DROP INDEX IF EXISTS users_username_lower_unique_idx</sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

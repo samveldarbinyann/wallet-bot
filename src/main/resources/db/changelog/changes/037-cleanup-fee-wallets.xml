@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="037-cleanup-fee-wallets" author="cleanup">
+        <delete tableName="fee_wallet">
+            <where>network IN ('ETH', 'BNB', 'TRX', 'TON', 'SOL', 'BTC', 'DOGE')</where>
+        </delete>
+    </changeSet>
+
+</databaseChangeLog>

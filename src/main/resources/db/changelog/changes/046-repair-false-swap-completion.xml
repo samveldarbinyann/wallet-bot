@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="046-repair-false-swap-completion" author="swap-deposit-fix">
+        <comment>Repair the SOL->USDT_TON swap order that was falsely marked COMPLETED by an unrelated
+            incoming USDT-TON deposit on its destination wallet (the deposit's tx hash was claimed as
+            the payout and the real DEPOSIT row was swallowed). Clears dest_tx_hash / amount_out_actual
+            and moves the order to REFUND_PENDING so the status poller reconciles it with the provider;
+            clearing the hash lets the next wallet scan re-record the swallowed deposit. Acts only when
+            exactly one such COMPLETED order exists. Going forward the deposit matcher is gated by
+            asset + amount + recency and DEST_AWAITING orders time out (see SwapStatusService /
+            SwapExpirationSweeper).
+        </comment>
+        <customChange class="com.example.walletbot.platform.persistence.migration.RepairFalseSwapCompletionChange">
+            <param name="fromNetwork" value="SOL"/>
+            <param name="toNetwork" value="USDT_TON"/>
+        </customChange>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="023-swap-orders" author="swap-mvp">
+        <createTable tableName="swap_orders">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_wallet_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="to_wallet_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_network" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="to_network" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_address" type="VARCHAR(256)"/>
+            <column name="to_address" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount_in" type="NUMERIC(30,18)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount_out_expected" type="NUMERIC(30,18)"/>
+            <column name="amount_out_min" type="NUMERIC(30,18)"/>
+            <column name="amount_out_actual" type="NUMERIC(30,18)"/>
+            <column name="rate_quoted" type="NUMERIC(30,18)"/>
+            <column name="provider" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provider_quote_id" type="VARCHAR(128)"/>
+            <column name="provider_order_id" type="VARCHAR(128)"/>
+            <column name="deposit_address" type="VARCHAR(256)"/>
+            <column name="source_tx_hash" type="VARCHAR(128)"/>
+            <column name="dest_tx_hash" type="VARCHAR(128)"/>
+            <column name="status" type="VARCHAR(24)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status_reason" type="VARCHAR(500)"/>
+            <column name="idem_key" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="intent_jti" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMPTZ" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMPTZ"/>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="swap_orders"
+                             columnNames="user_id, idem_key"
+                             constraintName="uq_swap_orders_user_idem"/>
+        <addUniqueConstraint tableName="swap_orders"
+                             columnNames="intent_jti"
+                             constraintName="uq_swap_orders_intent_jti"/>
+
+        <createIndex tableName="swap_orders" indexName="idx_swap_orders_status_expires">
+            <column name="status"/>
+            <column name="expires_at"/>
+        </createIndex>
+        <createIndex tableName="swap_orders" indexName="idx_swap_orders_user_created">
+            <column name="user_id"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+        <createIndex tableName="swap_orders" indexName="idx_swap_orders_to_wallet_status">
+            <column name="to_wallet_id"/>
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

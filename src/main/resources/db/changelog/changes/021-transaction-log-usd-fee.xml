@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="021-transaction-log-usd-fee" author="admin">
+        <addColumn tableName="transaction_logs">
+            <column name="usd_value" type="NUMERIC(20,2)"/>
+            <column name="fee_amount" type="NUMERIC(30,18)"/>
+            <column name="fee_symbol" type="VARCHAR(16)"/>
+            <column name="fee_usd" type="NUMERIC(20,2)"/>
+        </addColumn>
+
+        <createIndex tableName="transaction_logs" indexName="idx_txlog_user_created">
+            <column name="user_id"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <createIndex tableName="transaction_logs" indexName="idx_txlog_type_created">
+            <column name="type"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+
+        <createIndex tableName="transaction_logs" indexName="idx_txlog_network_created">
+            <column name="network"/>
+            <column name="created_at" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

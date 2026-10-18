@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="041-drop-refresh-replaced-by" author="security-audit">
+        <comment>
+            Refresh tokens are no longer rotated (stable, revocable tokens), so the
+            rotation successor pointer is dead. Drop replaced_by_id.
+        </comment>
+        <dropColumn tableName="refresh_tokens" columnName="replaced_by_id"/>
+    </changeSet>
+
+</databaseChangeLog>

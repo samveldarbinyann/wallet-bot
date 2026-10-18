@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="add-email-2fa-to-users" author="dev">
+        <addColumn tableName="users">
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="email_verified_at" type="TIMESTAMPTZ"/>
+            <column name="two_fa_enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <sql>CREATE UNIQUE INDEX idx_users_email_partial ON users(email) WHERE email IS NOT NULL;</sql>
+    </changeSet>
+
+    <changeSet id="create-email-otp-table" author="dev">
+        <createTable tableName="email_otp">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_email_otp_user"
+                             references="users(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="code_hash" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="purpose" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMPTZ">
+                <constraints nullable="false"/>
+            </column>
+            <column name="used" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempts" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="email_otp" indexName="idx_email_otp_user_id">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

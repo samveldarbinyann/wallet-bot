@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="036-fee-drop-project-fee" author="cleanup">
+        <dropColumn tableName="commission_log" columnName="project_fee"/>
+    </changeSet>
+
+    <changeSet id="036-fee-rename-tables" author="cleanup">
+        <renameTable oldTableName="commission_wallet" newTableName="fee_wallet"/>
+        <renameTable oldTableName="commission_log" newTableName="fee_log"/>
+    </changeSet>
+
+    <changeSet id="036-fee-rename-columns" author="cleanup">
+        <renameColumn tableName="fee_log" oldColumnName="commission_address" newColumnName="fee_address"
+                      columnDataType="VARCHAR(128)"/>
+        <renameColumn tableName="fee_log" oldColumnName="tx_hash_commission" newColumnName="tx_hash_fee"
+                      columnDataType="VARCHAR(128)"/>
+    </changeSet>
+
+    <changeSet id="036-fee-rename-indexes" author="cleanup">
+        <dropIndex tableName="fee_log" indexName="idx_commission_log_status_retry"/>
+        <dropIndex tableName="fee_log" indexName="idx_commission_log_user_created"/>
+        <createIndex tableName="fee_log" indexName="idx_fee_log_status_retry">
+            <column name="status"/>
+            <column name="retry_count"/>
+        </createIndex>
+        <createIndex tableName="fee_log" indexName="idx_fee_log_user_created">
+            <column name="user_id"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

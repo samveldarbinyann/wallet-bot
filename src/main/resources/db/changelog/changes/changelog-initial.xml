@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="initial-schema-v2" author="samvel">
+        <createTable tableName="users">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="telegram_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="state" type="VARCHAR(255)"/>
+            <column name="lang" type="VARCHAR(10)" defaultValue="en">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency" type="VARCHAR(10)" defaultValue="usd"/>
+            <column name="timezone" type="VARCHAR(50)" defaultValue="UTC"/>
+        </createTable>
+        <addUniqueConstraint tableName="users" columnNames="telegram_id" constraintName="uk_users_telegram_id"/>
+
+        <createTable tableName="wallets">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"
+                             references="users(id)"
+                             foreignKeyName="fk_wallets_user_id"
+                             deleteCascade="true"/>
+            </column>
+            <column name="address" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="private_key" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="network" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="wallets" indexName="idx_wallets_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createTable tableName="address_book">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"
+                             references="users(id)"
+                             foreignKeyName="fk_address_book_user_id"
+                             deleteCascade="true"/>
+            </column>
+            <column name="network" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(100)"/>
+            <column name="last_used" type="TIMESTAMPTZ"/>
+        </createTable>
+        <addUniqueConstraint tableName="address_book" columnNames="user_id, network, address"
+                             constraintName="uk_address_book_user_network_address"/>
+        <createIndex tableName="address_book" indexName="idx_address_book_user_network">
+            <column name="user_id"/>
+            <column name="network"/>
+        </createIndex>
+
+        <createTable tableName="transaction_logs">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="wallet_id" type="BIGINT"/>
+            <column name="type" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="network" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_address" type="VARCHAR(256)"/>
+            <column name="to_address" type="VARCHAR(256)"/>
+            <column name="amount" type="NUMERIC(30, 18)"/>
+            <column name="symbol" type="VARCHAR(20)"/>
+            <column name="tx_hash" type="VARCHAR(128)"/>
+            <column name="external_ref" type="VARCHAR(128)"/>
+            <column name="status" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_message" type="VARCHAR(500)"/>
+            <column name="created_at" type="TIMESTAMPTZ"/>
+            <column name="tx_timestamp" type="TIMESTAMPTZ"/>
+        </createTable>
+        <createIndex tableName="transaction_logs" indexName="idx_transaction_logs_user_id">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

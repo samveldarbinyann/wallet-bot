@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+      Gas sponsorship removed (MVP): users pay their own network gas. There is no longer a
+      sponsored/PROCESSING send path, no reserve wallets, no gas-sponsorship log, and no fee
+      wallets/fee log (the reimbursement that fed them is gone). Drop the now-orphaned schema.
+    -->
+
+    <changeSet id="045-fail-orphaned-processing-sends" author="gas-station-removal">
+        <comment>The PROCESSING tx status no longer exists; fail any rows a previous build left
+            in that state so the (now-removed) enum value can never be read back.
+        </comment>
+        <update tableName="transaction_logs">
+            <column name="status" value="FAILED"/>
+            <column name="error_message" value="gas-station removed (MVP)"/>
+            <where>status = 'PROCESSING'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="045-drop-swap-gas-columns" author="gas-station-removal">
+        <comment>Drop the sponsored-gas tracking columns added in 024-swap-gas-reimbursement.</comment>
+        <dropColumn tableName="swap_orders" columnName="gas_sponsored"/>
+        <dropColumn tableName="swap_orders" columnName="gas_reimbursement"/>
+        <dropColumn tableName="swap_orders" columnName="gas_reimbursement_tx_hash"/>
+        <dropColumn tableName="swap_orders" columnName="gas_sponsorship_id"/>
+    </changeSet>
+
+    <changeSet id="045-drop-gas-station-tables" author="gas-station-removal">
+        <comment>Drop reserve/gas-sponsorship/fee tables. reserve_wallet held encrypted reserve
+            private keys — sweep/back them up before deploying this migration.
+        </comment>
+        <dropTable tableName="gas_sponsorship_log"/>
+        <dropTable tableName="reserve_wallet"/>
+        <dropTable tableName="fee_log"/>
+        <dropTable tableName="fee_wallet"/>
+    </changeSet>
+
+</databaseChangeLog>

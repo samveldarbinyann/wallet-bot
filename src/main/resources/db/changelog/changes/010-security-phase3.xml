@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="security-phase3-modifications" author="security-audit">
+        <modifyDataType tableName="users" columnName="pin_hash" newDataType="VARCHAR(255)"/>
+
+        <addColumn tableName="users">
+            <column name="token_version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pin_failures" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pin_locked_until" type="TIMESTAMP"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="users" columnName="pin_locked_until"/>
+            <dropColumn tableName="users" columnName="pin_failures"/>
+            <dropColumn tableName="users" columnName="token_version"/>
+            <modifyDataType tableName="users" columnName="pin_hash" newDataType="VARCHAR(64)"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

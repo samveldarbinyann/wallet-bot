@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="014-drop-deprecated-setup-otp" author="security-audit">
+        <sql>DELETE FROM email_otp WHERE purpose = 'SETUP'</sql>
+    </changeSet>
+
+    <changeSet id="014-add-otp-context" author="security-audit">
+        <addColumn tableName="email_otp">
+            <column name="context" type="VARCHAR(255)"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="email_otp" columnName="context"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="014-email-otp-active-unique" author="security-audit">
+        <sql dbms="postgresql">
+            CREATE UNIQUE INDEX IF NOT EXISTS email_otp_user_purpose_active_uniq
+            ON email_otp (user_id, purpose) WHERE used = false
+        </sql>
+        <rollback>
+            <sql dbms="postgresql">DROP INDEX IF EXISTS email_otp_user_purpose_active_uniq</sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

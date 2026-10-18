@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="043-delete-phantom-gas-deposits" author="admin-dashboard">
+        <comment>Delete DEPOSIT rows that were actually gas-station reserve top-ups (reserve wallet
+            funding a user wallet to pay token-transfer gas). They polluted user history and inflated
+            admin deposit turnover. Going forward they are rejected at write time in
+            TransactionLogService.saveDepositSuccess. Matching is done in Java so it is correct across
+            EVM checksum / TON bounceable / TRON base58 address forms.
+        </comment>
+        <customChange class="com.example.walletbot.platform.persistence.migration.DeletePhantomGasDepositsChange"/>
+    </changeSet>
+
+</databaseChangeLog>

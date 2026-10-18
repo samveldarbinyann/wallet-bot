@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="032-admin-audit" author="security-audit">
+        <comment>
+            Append-only admin audit table (H-6). Recorded for every admin mutation:
+            block/freeze/unblock/forceLogout, commission/reserve-wallet updates,
+            broadcast send.
+        </comment>
+
+        <createTable tableName="admin_audit">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="actor_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_id" type="BIGINT"/>
+            <column name="target_type" type="VARCHAR(32)"/>
+            <column name="payload" type="VARCHAR(2000)"/>
+            <column name="ip" type="VARCHAR(64)"/>
+            <column name="ts" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="admin_audit" indexName="ix_admin_audit_actor">
+            <column name="actor_id"/>
+        </createIndex>
+        <createIndex tableName="admin_audit" indexName="ix_admin_audit_target">
+            <column name="target_id"/>
+        </createIndex>
+        <createIndex tableName="admin_audit" indexName="ix_admin_audit_ts">
+            <column name="ts"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

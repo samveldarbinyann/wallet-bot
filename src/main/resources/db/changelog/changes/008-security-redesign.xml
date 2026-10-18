@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="security-redesign-add-columns" author="dev">
+        <addColumn tableName="users">
+            <column name="pin_hash" type="VARCHAR(64)"/>
+            <column name="pin_enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="two_fa_login_enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="two_fa_tx_enabled" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="security-redesign-migrate-2fa-flag" author="dev">
+        <sql>UPDATE users
+             SET two_fa_login_enabled = two_fa_enabled</sql>
+    </changeSet>
+
+    <changeSet id="security-redesign-drop-old-flag" author="dev">
+        <dropColumn tableName="users" columnName="two_fa_enabled"/>
+    </changeSet>
+
+</databaseChangeLog>

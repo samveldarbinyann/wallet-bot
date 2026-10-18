@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="019-user-role-and-status" author="admin">
+        <addColumn tableName="users">
+            <column name="role" type="VARCHAR(16)" defaultValue="USER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(16)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status_reason" type="VARCHAR(500)"/>
+            <column name="status_changed_at" type="TIMESTAMPTZ"/>
+            <column name="status_changed_by" type="BIGINT"/>
+            <column name="last_login_at" type="TIMESTAMPTZ"/>
+        </addColumn>
+
+        <createIndex tableName="users" indexName="idx_user_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="users" indexName="idx_user_role">
+            <column name="role"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

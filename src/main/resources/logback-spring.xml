@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Logback configuration.
+
+  Console output is always on (captured by systemd-journald on the server).
+  File logging is enabled ONLY under the `prod` Spring profile, so local runs
+  and tests stay console-only. On the server the profile is activated via
+  SPRING_PROFILES_ACTIVE=prod and the log directory via LOG_DIR=/var/log/wallet-bot
+  (the directory is provisioned by the systemd `LogsDirectory=wallet-bot` unit setting).
+
+  Every appender renders through MaskingPatternLayout, which redacts API keys that
+  upstream RPC URLs embed (Helius/TonCenter query params, Alchemy path segment) from
+  the whole line — message AND stack trace. That is why services can log full,
+  detailed exceptions without leaking credentials.
+
+  Logger levels come from application.yaml (logging.level.*) — do not duplicate them here.
+  Rotation is handled by Logback itself (daily + 50MB, 14 days kept, 500MB total cap),
+  so no external logrotate is required.
+-->
+<configuration>
+    <!-- Spring Boot's log patterns, charsets, color/throwable conversion rules and framework logger levels. -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Log directory: server sets LOG_DIR=/var/log/wallet-bot; defaults to ./logs otherwise. -->
+    <property name="LOG_DIR" value="${LOG_DIR:-logs}"/>
+
+    <!-- Console (→ journald). Defined here (not via Spring's console-appender.xml) so the
+         masking layout also covers console output. -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${CONSOLE_LOG_THRESHOLD}</level>
+        </filter>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.example.walletbot.platform.logging.MaskingPatternLayout">
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            </layout>
+            <charset>${CONSOLE_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <springProfile name="prod">
+        <!-- Main file: everything from the root level (INFO). -->
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_DIR}/wallet-bot.log</file>
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="com.example.walletbot.platform.logging.MaskingPatternLayout">
+                    <pattern>${FILE_LOG_PATTERN}</pattern>
+                </layout>
+                <charset>${FILE_LOG_CHARSET}</charset>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_DIR}/wallet-bot.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <maxFileSize>50MB</maxFileSize>
+                <maxHistory>14</maxHistory>
+                <totalSizeCap>500MB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+
+        <!-- Problems-only file: WARN and ERROR. -->
+        <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_DIR}/wallet-bot-error.log</file>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>WARN</level>
+            </filter>
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="com.example.walletbot.platform.logging.MaskingPatternLayout">
+                    <pattern>${FILE_LOG_PATTERN}</pattern>
+                </layout>
+                <charset>${FILE_LOG_CHARSET}</charset>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_DIR}/wallet-bot-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+                <maxFileSize>50MB</maxFileSize>
+                <maxHistory>14</maxHistory>
+                <totalSizeCap>500MB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+
+        <root>
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+    </springProfile>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

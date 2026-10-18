@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="033-user-row-version" author="security-audit">
+        <comment>
+            Optimistic-lock version column on users (M-6). Concurrent updates to
+            security-sensitive fields (token_version, pin_*, two_fa_*) now throw
+            ObjectOptimisticLockingFailureException instead of silently losing one
+            of the writes, preventing tokenVersion-bump races.
+        </comment>
+        <addColumn tableName="users">
+            <column name="row_version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <include file="db/changelog/changes/changelog-initial.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/changelog-deposit-scan-debounce.xml" relativeToChangelogFile="false"/>
+    <include file="changes/004-add-unique-wallet-txhash.xml" relativeToChangelogFile="true"/>
+    <include file="db/changelog/changes/changelog-remove-pol-bnb-wallets.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/changelog-wallet-network-balances.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/changelog-user-pinned-info.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/changelog-user-names.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/005-tx-display-time-index.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/007-drop-user-state.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/changelog-2fa-email.xml" relativeToChangelogFile="false"/>
+    <include file="changes/008-security-redesign.xml" relativeToChangelogFile="true"/>
+    <include file="changes/009-pending-email.xml" relativeToChangelogFile="true"/>
+    <include file="changes/010-security-phase3.xml" relativeToChangelogFile="true"/>
+    <include file="changes/011-drop-pinned-info-message.xml" relativeToChangelogFile="true"/>
+    <include file="changes/012-remove-xrp-wallets.xml" relativeToChangelogFile="true"/>
+    <include file="changes/013-remove-ltc-wallets.xml" relativeToChangelogFile="true"/>
+    <include file="changes/014-otp-context.xml" relativeToChangelogFile="true"/>
+    <include file="changes/015-notification-preferences.xml" relativeToChangelogFile="true"/>
+    <include file="changes/016-notifications-table.xml" relativeToChangelogFile="true"/>
+    <include file="changes/018-commission-and-reserve.xml" relativeToChangelogFile="true"/>
+    <include file="changes/019-user-role-and-status.xml" relativeToChangelogFile="true"/>
+    <include file="changes/021-transaction-log-usd-fee.xml" relativeToChangelogFile="true"/>
+    <include file="changes/022-broadcasts.xml" relativeToChangelogFile="true"/>
+    <include file="changes/023-swap-orders.xml" relativeToChangelogFile="true"/>
+    <include file="changes/024-swap-gas-reimbursement.xml" relativeToChangelogFile="true"/>
+    <include file="changes/025-broadcast-image.xml" relativeToChangelogFile="true"/>
+    <include file="changes/026-notification-channel-prefs.xml" relativeToChangelogFile="true"/>
+    <include file="changes/027-drop-legacy-pin-hashes.xml" relativeToChangelogFile="true"/>
+    <include file="changes/028-send-idempotency.xml" relativeToChangelogFile="true"/>
+    <include file="changes/029-encrypt-emails.xml" relativeToChangelogFile="true"/>
+    <include file="changes/030-bump-pin-to-6-digits.xml" relativeToChangelogFile="true"/>
+    <include file="changes/031-refresh-tokens.xml" relativeToChangelogFile="true"/>
+    <include file="changes/032-admin-audit.xml" relativeToChangelogFile="true"/>
+    <include file="changes/033-user-row-version.xml" relativeToChangelogFile="true"/>
+    <include file="changes/034-notification-broadcast-fk.xml" relativeToChangelogFile="true"/>
+    <include file="changes/035-drop-reserve-high-threshold.xml" relativeToChangelogFile="true"/>
+    <include file="changes/036-fee-rename.xml" relativeToChangelogFile="true"/>
+    <include file="changes/037-cleanup-fee-wallets.xml" relativeToChangelogFile="true"/>
+    <include file="changes/038-drop-fee-log-amount.xml" relativeToChangelogFile="true"/>
+    <include file="changes/039-drop-two-fa-tx.xml" relativeToChangelogFile="true"/>
+    <include file="changes/040-fee-log-broadcast-state.xml" relativeToChangelogFile="true"/>
+    <include file="changes/041-drop-refresh-replaced-by.xml" relativeToChangelogFile="true"/>
+    <include file="changes/043-delete-phantom-gas-deposits.xml" relativeToChangelogFile="true"/>
+    <include file="changes/044-drop-fiat-orders.xml" relativeToChangelogFile="true"/>
+    <include file="changes/045-drop-gas-station.xml" relativeToChangelogFile="true"/>
+    <include file="changes/046-repair-false-swap-completion.xml" relativeToChangelogFile="true"/>
+    <include file="changes/047-remove-doge.xml" relativeToChangelogFile="true"/>
+    <include file="changes/048-add-user-theme.xml" relativeToChangelogFile="true"/>
+    <include file="changes/049-outbox-event.xml" relativeToChangelogFile="true"/>
+    <include file="changes/050-notification-consumed.xml" relativeToChangelogFile="true"/>
+    <include file="changes/051-drop-admin-audit.xml" relativeToChangelogFile="true"/>
+    <include file="changes/052-drop-orphan-audit-tables.xml" relativeToChangelogFile="true"/>
+    <include file="changes/053-user-username-index.xml" relativeToChangelogFile="true"/>
+    <include file="changes/054-user-username-unique-index.xml" relativeToChangelogFile="true"/>
+    <include file="changes/055-drop-outbox-and-notification-consumed.xml" relativeToChangelogFile="true"/>
+
+
+</databaseChangeLog>

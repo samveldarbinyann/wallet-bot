@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="030-bump-pin-to-6-digits" author="security-audit">
+        <comment>
+            Bump PIN minimum from 4 to 6 digits (H-5). Any existing 4-digit PIN can no
+            longer be verified by the new validators, so we proactively invalidate them
+            and force users to re-set via /pin/setup/request -> /pin/setup/confirm.
+            Pre-prod safe.
+        </comment>
+        <sql>
+            UPDATE users
+            SET pin_hash         = NULL,
+                pin_enabled      = false,
+                pin_failures     = 0,
+                pin_locked_until = NULL,
+                token_version    = token_version + 1
+            WHERE pin_enabled = true
+               OR pin_hash IS NOT NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

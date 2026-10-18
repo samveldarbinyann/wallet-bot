@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="028-send-idempotency" author="security-audit">
+        <comment>
+            Durable idempotency for /send (and /send/confirm) — replaces the in-memory
+            Caffeine cache that could be evicted under load or in multi-instance deployments,
+            allowing double-spends. UNIQUE(user_id, idem_key) serialises concurrent retries.
+        </comment>
+
+        <createTable tableName="send_idempotency">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="idem_key" type="VARCHAR(80)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tx_hash" type="VARCHAR(200)"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completed_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="send_idempotency"
+                columnNames="user_id, idem_key"
+                constraintName="uq_send_idempotency_user_key"/>
+
+        <createIndex tableName="send_idempotency" indexName="ix_send_idempotency_created_at">
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

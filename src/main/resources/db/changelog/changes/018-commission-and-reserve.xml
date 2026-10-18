@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="018-reserve-wallet" author="system">
+        <createTable tableName="reserve_wallet">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="network" type="VARCHAR(20)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_reserve_network"/>
+            </column>
+            <column name="address" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="encrypted_private_key" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="low_threshold" type="DECIMAL(36, 18)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="high_threshold" type="DECIMAL(36, 18)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="018-commission-wallet" author="system">
+        <createTable tableName="commission_wallet">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="network" type="VARCHAR(20)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_commission_network"/>
+            </column>
+            <column name="address" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="018-commission-log" author="system">
+        <createTable tableName="commission_log">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_commission_log_user"
+                             references="users(id)"/>
+            </column>
+            <column name="network" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="DECIMAL(36, 18)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_fee" type="DECIMAL(36, 18)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gas_reimbursement" type="DECIMAL(36, 18)" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="commission_address" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tx_hash_user" type="VARCHAR(128)"/>
+            <column name="tx_hash_commission" type="VARCHAR(128)"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retry_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_error" type="VARCHAR(500)"/>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="commission_log" indexName="idx_commission_log_status_retry">
+            <column name="status"/>
+            <column name="retry_count"/>
+        </createIndex>
+
+        <createIndex tableName="commission_log" indexName="idx_commission_log_user_created">
+            <column name="user_id"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="018-gas-sponsorship-log" author="system">
+        <createTable tableName="gas_sponsorship_log">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_gas_sponsorship_user"
+                             references="users(id)"/>
+            </column>
+            <column name="token_network" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_network" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_address" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="native_amount" type="DECIMAL(36, 18)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fiat_value_usd" type="DECIMAL(18, 4)"/>
+            <column name="topup_tx_hash" type="VARCHAR(128)"/>
+            <column name="related_send_tx_hash" type="VARCHAR(128)"/>
+            <column name="provider" type="VARCHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_error" type="VARCHAR(500)"/>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="NOW()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="gas_sponsorship_log" indexName="idx_gas_sponsorship_user_created">
+            <column name="user_id"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="wallet-network-balances" author="wallet-bot">
+        <createTable tableName="wallet_network_balances">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="wallet_id" type="BIGINT">
+                <constraints nullable="false"
+                             references="wallets(id)"
+                             foreignKeyName="fk_wallet_network_balances_wallet"
+                             deleteCascade="true"/>
+            </column>
+            <column name="network" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="VARCHAR(72)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMPTZ">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="wallet_network_balances"
+                             columnNames="wallet_id, network"
+                             constraintName="uk_wallet_network_balances_wallet_network"/>
+        <createIndex tableName="wallet_network_balances" indexName="idx_wallet_network_balances_wallet">
+            <column name="wallet_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

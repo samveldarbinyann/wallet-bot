@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="055-drop-outbox-event" author="sam">
+        <comment>
+            Drop outbox_event (created in 049). The transactional outbox → Kafka notification
+            pipeline was reverted back to direct afterCommit + @Async dispatch. Unused by current code.
+        </comment>
+        <dropTable tableName="outbox_event"/>
+    </changeSet>
+
+    <changeSet id="055-drop-notification-consumed" author="sam">
+        <comment>
+            Drop notification_consumed (created in 050) — the Kafka-consumer idempotency ledger,
+            unused now that notification delivery no longer goes through Kafka.
+        </comment>
+        <dropTable tableName="notification_consumed"/>
+    </changeSet>
+
+</databaseChangeLog>

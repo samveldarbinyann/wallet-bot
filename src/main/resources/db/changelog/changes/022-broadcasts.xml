@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="022-broadcasts" author="admin">
+        <createTable tableName="broadcast">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_by" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title_ru" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title_en" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body_ru" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="body_en" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target" type="VARCHAR(32)" defaultValue="ALL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="channels" type="VARCHAR(64)" defaultValue="IN_APP,BOT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(16)" defaultValue="DRAFT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sent_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sent_at" type="TIMESTAMPTZ"/>
+        </createTable>
+
+        <createIndex tableName="broadcast" indexName="idx_broadcast_created_at">
+            <column name="created_at" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

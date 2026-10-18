@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="049-outbox-event" author="kafka-outbox">
+        <comment>Transactional outbox. A message row is inserted in the SAME database transaction as
+            the business change (e.g. a deposit), so the two commit atomically — no notification can
+            survive a rolled-back deposit, and no deposit can lose its notification. A relay later
+            forwards unpublished rows to Kafka and stamps published_at. The partial-ish index on
+            (published_at, id) keeps the relay's "oldest unpublished first" scan cheap.
+        </comment>
+        <createTable tableName="outbox_event">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="topic" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="msg_key" type="varchar(200)"/>
+            <column name="payload" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="published_at" type="timestamp"/>
+        </createTable>
+        <createIndex tableName="outbox_event" indexName="idx_outbox_unpublished">
+            <column name="published_at"/>
+            <column name="id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

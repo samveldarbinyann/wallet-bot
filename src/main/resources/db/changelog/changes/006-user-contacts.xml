@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="add-user-phone-and-sync-flag" author="wallet-bot">
+        <addColumn tableName="users">
+            <column name="phone" type="VARCHAR(512)"/>
+            <column name="phone_hash" type="VARCHAR(64)"/>
+        </addColumn>
+        <createIndex tableName="users" indexName="idx_users_phone_hash">
+            <column name="phone_hash"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create-user-contacts-table" author="wallet-bot">
+        <createTable tableName="user_contacts">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="owner_user_id" type="BIGINT">
+                <constraints nullable="false"
+                             references="users(id)"
+                             foreignKeyName="fk_user_contacts_owner"
+                             deleteCascade="true"/>
+            </column>
+            <column name="phone" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(100)"/>
+            <column name="last_name" type="VARCHAR(100)"/>
+            <column name="username" type="VARCHAR(64)"/>
+            <column name="created_at" type="TIMESTAMPTZ" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="user_contacts"
+                             columnNames="owner_user_id, phone"
+                             constraintName="uk_user_contacts_owner_phone"/>
+
+        <createIndex tableName="user_contacts" indexName="idx_user_contacts_phone">
+            <column name="phone"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

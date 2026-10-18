@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="047-remove-doge-network" author="doge-removal">
+        <comment>DOGE support removed (MVP): there is no good free RPC provider for Dogecoin and it
+            was the last consumer of Tatum. Purge every row whose network is DOGE before the enum
+            constant is dropped from BlockchainNetwork — otherwise Hibernate fails mapping the
+            orphaned 'DOGE' string on read. No user holds DOGE, so this strands no funds. Child
+            rows that reference a DOGE wallet are deleted before the wallet rows themselves.
+        </comment>
+        <delete tableName="wallet_network_balances">
+            <where>network = 'DOGE'</where>
+        </delete>
+        <delete tableName="transaction_logs">
+            <where>network = 'DOGE'</where>
+        </delete>
+        <delete tableName="swap_orders">
+            <where>from_network = 'DOGE' OR to_network = 'DOGE'</where>
+        </delete>
+        <delete tableName="address_book">
+            <where>network = 'DOGE'</where>
+        </delete>
+        <delete tableName="wallets">
+            <where>network = 'DOGE'</where>
+        </delete>
+    </changeSet>
+
+</databaseChangeLog>

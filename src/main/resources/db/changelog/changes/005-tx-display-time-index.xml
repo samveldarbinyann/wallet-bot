@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="005-tx-display-time-index" author="dev">
+        <sql>
+            CREATE INDEX IF NOT EXISTS idx_tx_user_display_time
+                ON transaction_logs (user_id, COALESCE (tx_timestamp, created_at) DESC);
+        </sql>
+        <rollback>
+            <sql>DROP INDEX IF EXISTS idx_tx_user_display_time;</sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

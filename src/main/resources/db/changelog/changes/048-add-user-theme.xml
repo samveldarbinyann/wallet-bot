@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="048-add-user-theme" author="theme-persistence">
+        <comment>Persist the Mini App UI theme per user (telegram/dark/light). Until now the theme
+            lived only in browser localStorage, which Telegram Desktop does not retain between
+            launches, so the choice reset to the default on every desktop re-open. Backing it with a
+            users column (like lang/currency/timezone) makes the preference durable on every
+            platform.
+        </comment>
+        <addColumn tableName="users">
+            <column name="theme" type="VARCHAR(16)" defaultValue="telegram">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
